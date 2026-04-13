@@ -34,9 +34,13 @@ async function generateInterViewReportController(req, res) {
         }
 
         const parser = new PDFParse({ data: req.file.buffer })
-        const resumeContent = await parser.getText()
-        await parser.destroy()
-        resumeText = resumeContent.text?.trim() || ""
+
+        try {
+            const resumeContent = await parser.getText()
+            resumeText = resumeContent.text?.trim() || ""
+        } finally {
+            await parser.destroy()
+        }
     }
 
     const interViewReportByAi = await generateInterviewReport({
@@ -54,6 +58,7 @@ async function generateInterViewReportController(req, res) {
     })
 
     res.status(201).json({
+        success: true,
         message: "Interview report generated successfully.",
         interviewReport
     })
@@ -71,11 +76,13 @@ async function getInterviewReportByIdController(req, res) {
 
     if (!interviewReport) {
         return res.status(404).json({
+            success: false,
             message: "Interview report not found."
         })
     }
 
     res.status(200).json({
+        success: true,
         message: "Interview report fetched successfully.",
         interviewReport
     })
@@ -89,6 +96,7 @@ async function getAllInterviewReportsController(req, res) {
     const interviewReports = await interviewReportModel.find({ user: req.user.id }).sort({ createdAt: -1 }).select("-resume -selfDescription -jobDescription -__v -technicalQuestions -behavioralQuestions -skillGaps -preparationPlan")
 
     res.status(200).json({
+        success: true,
         message: "Interview reports fetched successfully.",
         interviewReports
     })
@@ -105,6 +113,7 @@ async function generateResumePdfController(req, res) {
 
     if (!interviewReport) {
         return res.status(404).json({
+            success: false,
             message: "Interview report not found."
         })
     }

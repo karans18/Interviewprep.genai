@@ -1,10 +1,12 @@
 require("dotenv").config()
+
 const app = require("./src/app")
-const connectToDB = require("./src/config/database")
+const { connectToDB } = require("./src/config/database")
 
-connectToDB()
+const port = Number(process.env.PORT) || 3000
 
+void connectToDB()
 
-app.listen(3000, () => {
-    console.log("Server is running on port 3000")
+app.listen(port, () => {
+    console.log(`[SERVER] API server is running on port ${port} in ${process.env.NODE_ENV || "development"} mode.`)
 })
